@@ -29,23 +29,17 @@ RUN echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config && \
 
 # -----------------------------
 # Install Cloudflare Tunnel (Thay thế Ngrok)
-# -----------------------------
-RUN curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
-    dpkg -i cloudflared.deb && \
-    rm cloudflared.deb
 
-# -----------------------------
-# Copy start script
-# -----------------------------
-COPY start-cloudflared.sh /usr/local/bin/start-cloudflared.sh
-RUN chmod +x /usr/local/bin/start-cloudflared.sh
+RUN curl -SSLs https://playit-cloud.github.io/ppa/key.gpg | gpg --dearmor | tee /etc/apt/trusted.gpg.d/playit.gpg >/dev/null && \
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit.gpg] https://playit-cloud.github.io/ppa/data ./" | tee /etc/apt/sources.list.d/playit-cloud.list && \
+    apt update && apt install -y playit
 
-# -----------------------------
-# Expose ports
-# -----------------------------
-EXPOSE 8080 22
+# 5. Copy script khởi chạy
+COPY start-playit.sh /usr/local/bin/start-playit.sh
+RUN chmod +x /usr/local/bin/start-playit.sh
 
-# -----------------------------
-# Start container
-# -----------------------------
-CMD ["/usr/local/bin/start-cloudflared.sh"]
+# 6. Mở port (Thực tế Playit không cần mở port inbound, nhưng cứ để SSH hoạt động)
+EXPOSE 22 8080
+
+# 7. Chạy container
+CMD ["/usr/local/bin/start-playit.sh"]
