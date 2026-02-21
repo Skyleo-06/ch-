@@ -23,14 +23,5 @@ RUN useradd -m -s /bin/bash trthaodev && \
     usermod -aG sudo trthaodev && \
     echo "root:123456" | chpasswd
 
-# --- 4. CÀI ĐẶT FILEBROWSER ---
-RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash
-
-# --- 5. SCRIPT KHỞI ĐỘNG ---
-RUN echo '#!/bin/bash' > /start.sh && \
-    echo '/usr/sbin/sshd -D &' >> /start.sh && \
-    echo 'filebrowser -r / -p 8080 --no-auth --address 0.0.0.0' >> /start.sh && \
-    chmod +x /start.sh
-
 EXPOSE 2222 8080
 CMD ["/start.sh"]
